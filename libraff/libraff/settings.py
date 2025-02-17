@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     'apis',
     'books',
+    'users',
     'rest_framework'
 ]
 
@@ -52,6 +53,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Custom User 
+AUTH_USER_MODEL = 'users.CustomerUser'
 
 ROOT_URLCONF = 'libraff.urls'
 
@@ -125,3 +129,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Media
+import os
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
