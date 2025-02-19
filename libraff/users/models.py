@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from books.models import Book
 
-# Create your models here.
+
 
 class CustomerUser(AbstractUser):
     email = models.EmailField(unique=True, null=True, blank=True)

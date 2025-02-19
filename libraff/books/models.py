@@ -1,7 +1,5 @@
 from django.db import models
 
-# Create your models here.
-
 
 
 class Book(models.Model):
@@ -19,6 +17,9 @@ class Book(models.Model):
         null=True,
         blank=True
     )
+    like = models.IntegerField(default=0)
+    pdf = models.FileField(upload_to='books/pdf')
 
     def __str__(self):
         return f'{self.title}'
+    
