@@ -3,7 +3,7 @@ from .models import Book
 
 class BookAdmin(admin.ModelAdmin):
     # Fields to display in the list view
-    list_display = ('title', 'author', 'price')
+    list_display = ('title', 'author', 'price', 'like', 'pdf')  # Add 'pdf' here
     
     # Enable search functionality for title and author
     search_fields = ('title', 'author')
@@ -17,7 +17,10 @@ class BookAdmin(admin.ModelAdmin):
             'fields': ('title', 'author')
         }),
         ('Pricing Information', {
-            'fields': ('price',)
+            'fields': ('price', 'like')
+        }),
+        ('File Information', {
+            'fields': ('pdf',)  # Add 'pdf' here for editing
         }),
     )
     
