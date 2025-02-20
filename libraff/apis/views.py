@@ -15,7 +15,7 @@ __all__ = [
     'BookLikeAPIView', 'BookDownloadAPIView',
     'BookSearchAPIView', 'UserListAPIView',
     'UserCommentListAPIView', 'BookCommentListAPIView',
-    'BookLikeListAPIView', 'CommentLikeListAPIView',
+    'LikedBookListAPIView', 'CommentLikeListAPIView',
     'RegisterAPIView'   
 ]
 
@@ -165,14 +165,15 @@ class BookCommentListAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class BookLikeListAPIView(APIView):
+class LikedBookListAPIView(APIView):
     """
-    API endpoint to retrieve all liked books.
+    API endpoint to retrieve all liked books by user.
     """
     permission_classes = [IsAuthenticated] 
-    def get(self, request):
-        comment = LikeBook.objects.all()
-        serializer = LikeBookSerializer(comment, many=True)
+    def get(self, request, user_id):
+        user = get_object_or_404(CustomerUser, id=user_id)
+        liked_books = LikeBook.objects.filter(user=user)
+        serializer = LikeBookSerializer(liked_books, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

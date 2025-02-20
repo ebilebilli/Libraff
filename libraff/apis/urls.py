@@ -14,7 +14,8 @@ urlpatterns = [path('login/', obtain_auth_token, name='login'),
                path('user/<int:user_id>/comments/', UserCommentListAPIView.as_view(), name='user-comments'),
                path('book/<int:book_id>/comments/', BookCommentListAPIView.as_view(), name='book-comments'),
                path('comment/likes/', CommentLikeListAPIView.as_view(), name='comment-likes'),
-               path('book/likes/', BookLikeListAPIView.as_view(), name='book-likes'),
+               path('user/<int:user_id>/liked_books/', LikedBookListAPIView.as_view(), name='user-liked-books')
+               
 
 
 ]
