@@ -1,24 +1,44 @@
 from rest_framework.views import APIView, Response, status
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import redirect
 
 from books.serializers import *
 from books.models import Book
 from users.models import *
 from users.serializers import *
 
+
 __all__ = [
     'BookListAPIView', 'BookDetailAPIView',
     'BookLikeAPIView', 'BookDownloadAPIView',
     'BookSearchAPIView', 'UserListAPIView',
     'UserCommentListAPIView', 'BookCommentListAPIView',
-    'BookLikeListAPIView', 'CommentLikeListAPIView'   
+    'BookLikeListAPIView', 'CommentLikeListAPIView',
+    'RegisterAPIView'   
 ]
+
+
+class RegisterAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = CustomerUserRegisterDataSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({'message': 'Profile created successfully', 
+                             'username': user.username,
+                             'email': user.email
+                            },
+                            status=status.HTTP_201_CREATED
+                        )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class BookListAPIView(APIView):
     """
     API endpoint to retrieve a list of books or add a new book.
     """
+    
     def get(self, request):
         books = Book.objects.all()
         serializer = BookSerializer(books, many=True)
@@ -31,11 +51,17 @@ class BookListAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class BookDetailAPIView(APIView):
     """
     API endpoint to retrieve, update, or delete a book by its ID.
     """
+    permission_classes = [IsAuthenticated] 
+
     def get(self, request, book_id):
+        if not request.user.is_authenticated:
+            return redirect('/register/') 
+        
         book = get_object_or_404(Book, id=book_id)
         serializer = BookSerializer(book)
         return Response(serializer.data)
@@ -62,28 +88,38 @@ class BookDetailAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class BookLikeAPIView(APIView):
-    """
-    API endpoint to like a book by its ID.
-    """
-    def patch(self, request, book_id):
+    permission_classes = [IsAuthenticated] 
+    def post(self, request, book_id):
         book = get_object_or_404(Book, id=book_id)
-        serializer = BookSerializer(book, request.data, partial=True)
-        if serializer.is_valid():
-            book.like += 1
+        user = request.user  
+        like_instance = LikeBook.objects.filter(user=user, book=book).first()
+
+        if like_instance:
+            like_instance.delete()  
+            book.like = max(0, book.like - 1)  
             book.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Like removed'}, status=status.HTTP_200_OK)
+        
+        LikeBook.objects.create(user=user, book=book)
+        book.like += 1
+        book.save()
+
+        return Response({'detail': "Book liked"}, status=status.HTTP_200_OK)
+
+    
 
 class BookDownloadAPIView(APIView):
     """
     API endpoint to download a book PDF by its ID.
     """
+    permission_classes = [IsAuthenticated] 
     def get(self, request, book_id):
         book = get_object_or_404(Book, id=book_id)
         if book.pdf:
             response = FileResponse(book.pdf.open(), as_attachment=True, filename=f'{book.title}.pdf')
             return response
         return Response({'error': 'File not available'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class BookSearchAPIView(APIView):
     """
@@ -95,46 +131,56 @@ class BookSearchAPIView(APIView):
         serializer = BookSerializer(books, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class UserListAPIView(APIView):
     """
     API endpoint to retrieve all users.
     """
+    permission_classes = [IsAuthenticated] 
     def get(self, request):
         user = CustomerUser.objects.all()
         serializer = UserSerializer(user, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class UserCommentListAPIView(APIView):
     """
     API endpoint to retrieve comments made by a specific user.
     """
+    permission_classes = [IsAuthenticated] 
     def get(self, request, user_id):
-        comment = Comments.objects.filter(book_id=user_id)
+        comment = Comments.objects.filter(id=user_id)
         serializer = CommentSerializer(comment, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class BookCommentListAPIView(APIView):
     """
     API endpoint to retrieve comments for a specific book.
     """
+    permission_classes = [IsAuthenticated] 
     def get(self, request, book_id):
         comment = Comments.objects.filter(book_id=book_id)
         serializer = CommentSerializer(comment, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class BookLikeListAPIView(APIView):
     """
     API endpoint to retrieve all liked books.
     """
+    permission_classes = [IsAuthenticated] 
     def get(self, request):
         comment = LikeBook.objects.all()
         serializer = LikeBookSerializer(comment, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class CommentLikeListAPIView(APIView):
     """
     API endpoint to retrieve all liked comments.
     """
+    permission_classes = [IsAuthenticated] 
     def get(self, request):
         comment = LikeComment.objects.all()
         serializer = LikeCommentSerializer(comment, many=True)
