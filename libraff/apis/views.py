@@ -2,6 +2,7 @@ from rest_framework.views import APIView, Response, status
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import redirect
 
 from books.serializers import *
@@ -49,15 +50,23 @@ class AccountUpdateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class BookPagination(PageNumberPagination):
+    page_size = 10
+
+
 class BookListAPIView(APIView):
     """
     API endpoint to retrieve a list of books or add a new book.
     """
-    
+    pagination_class = BookPagination
+
     def get(self, request):
-        books = Book.objects.all()
-        serializer = BookSerializer(books, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        books = Book.objects.all().order_by('-like')
+        pagination = self.pagination_class()
+        result_page = pagination.paginate_queryset(books, request)
+
+        serializer = BookSerializer(result_page, many=True)
+        return pagination.get_paginated_response(serializer.data)
     
     def post(self, request, *args, **kwargs):
         serializer = CreateSerializer(data=request.data)
