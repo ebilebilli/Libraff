@@ -1,82 +1,107 @@
-# Book Library API
+# 📚 Book Library API
 
-## Overview
-The **Book Library API** is a Django-based backend system that allows users to interact with books by downloading, liking, and commenting on them. Additionally, users can like comments and manage their profiles.
+A **Django REST Framework** based API for managing books, user profiles, comments, and likes. Users can search, download books, and interact through likes and comments.
 
-## Features
-- List all books
-- Retrieve details of a specific book
-- Like a book
-- Download a book
-- Search for books
-- List all users
-- Retrieve comments by a user
-- Retrieve comments on a book
-- Like a comment
-- View all liked books
+## 🚀 Features
 
-## Technologies Used
+- **Book Management**:
+  - List, retrieve, create, update, and delete books.
+  - Like/unlike books.
+  - Download books as PDFs.
+  - Search books by title.
+
+- **User Management**:
+  - Register new users.
+  - Update user profiles.
+  - List all users.
+
+- **Comment System**:
+  - Add comments to books.
+  - View comments by users and books.
+  - Like/unlike comments.
+
+## 🛠️ Technologies Used
+
 - **Django** (Python Web Framework)
 - **Django REST Framework** (API Development)
 - **SQLite/PostgreSQL** (Database)
 
-## Installation & Setup
+## 📄 Installation & Setup
+
 1. Clone the repository:
-   ```sh
+
+   ```bash
    git clone <repository_url>
    cd book-library-api
    ```
-2. Create a virtual environment and activate it:
-   ```sh
+
+2. Set up a virtual environment:
+
+   ```bash
    python -m venv env
-   source env/bin/activate  # For Mac/Linux
-   env\Scripts\activate  # For Windows
+   source env/bin/activate  # Mac/Linux
+   env\Scripts\activate    # Windows
    ```
+
 3. Install dependencies:
-   ```sh
+
+   ```bash
    pip install -r requirements.txt
    ```
+
 4. Apply database migrations:
-   ```sh
+
+   ```bash
    python manage.py migrate
    ```
+
 5. Create a superuser (optional for admin access):
-   ```sh
+
+   ```bash
    python manage.py createsuperuser
    ```
-6. Run the development server:
-   ```sh
+
+6. Start the development server:
+
+   ```bash
    python manage.py runserver
    ```
 
-## API Endpoints
+## 📊 API Endpoints
 
-### Book Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/books/` | List all books |
-| `POST` | `/books/` | Add a new book |
-| `GET` | `/book/<book_id>/` | Get details of a specific book |
-| `DELETE` | `/book/<book_id>/` | Delete a book |
-| `PUT` | `/book/<book_id>/` | Update book details |
-| `PATCH` | `/book/<book_id>/like` | Like a book |
-| `GET` | `/book/<book_id>/download` | Download a book PDF |
-| `GET` | `books/search/?query=<search_term>` | Search for books |
+### 📚 Book Endpoints
 
-### User Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/users/` | List all users |
-| `GET` | `/user/<user_id>/comments/` | Get comments by a user |
+| Method   | Endpoint                  | Description             |
+|----------|---------------------------|-------------------------|
+| `GET`    | `/books/`                 | List all books          |
+| `POST`   | `/books/`                 | Add a new book          |
+| `GET`    | `/book/<book_id>/`        | Retrieve book details   |
+| `PUT`    | `/book/<book_id>/`        | Update book details     |
+| `PATCH`  | `/book/<book_id>/`        | Partially update book   |
+| `DELETE` | `/book/<book_id>/`        | Delete a book           |
+| `POST`   | `/book/<book_id>/like/`   | Like/unlike a book      |
+| `GET`    | `/book/<book_id>/download`| Download book PDF       |
+| `GET`    | `/books/search/?query=<>` | Search books by title   |
 
-### Comment Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/book/<book_id>/comments/` | Get comments for a book |
-| `GET` | `/comment/likes/` | List all liked comments |
-| `GET` | `/book/likes/` | List all liked books |
+### 👤 User Endpoints
 
-## Models
+| Method   | Endpoint                  | Description              |
+|----------|---------------------------|--------------------------|
+| `POST`   | `/register/`              | Register a new user      |
+| `PATCH`  | `/account/update/`        | Update user profile      |
+| `GET`    | `/users/`                 | List all users          |
+
+### 💬 Comment Endpoints
+
+| Method   | Endpoint                      | Description                   |
+|----------|-------------------------------|-------------------------------|
+| `POST`   | `/book/<book_id>/comment/`    | Add a comment to a book       |
+| `GET`    | `/user/<user_id>/comments/`   | Get comments by a user        |
+| `GET`    | `/book/<book_id>/comments/`   | Get comments for a book       |
+| `GET`    | `/comments/likes/`            | List all liked comments       |
+| `GET`    | `/books/likes/`               | List all liked books          |
+
+## 📚 Models
 
 ### Book Model
 ```python
@@ -88,7 +113,7 @@ class Book(models.Model):
     pdf = models.FileField(upload_to='books/pdf')
 
     def __str__(self):
-        return f'{self.title}'
+        return self.title
 ```
 
 ### User Model
@@ -108,9 +133,11 @@ class Comments(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 ```
 
-## License
-This project is open-source and available under the **MIT License**.
+## 📜 License
 
-## Author
+This project is licensed under the **MIT License**.
+
+## 👨‍💻 Author
+
 Developed by **Abil Abilli** 🚀
 
