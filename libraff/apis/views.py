@@ -9,7 +9,7 @@ from books.serializers import *
 from books.models import Book
 from users.models import *
 from users.serializers import *
-                                   
+
 
 __all__ = [
     'BookListAPIView', 'BookDetailAPIView',
@@ -17,7 +17,7 @@ __all__ = [
     'BookSearchAPIView', 'UserListAPIView',
     'UserCommentListAPIView', 'BookCommentListAPIView',
     'LikedBookListAPIView', 'CommentLikeListAPIView',
-    'RegisterAPIView'   
+    'RegisterAPIView', 'AddCommentToBook'   
 ]
 
 
@@ -131,6 +131,21 @@ class BookLikeAPIView(APIView):
         return Response({'detail': "Book liked"}, status=status.HTTP_200_OK)
 
 
+class AddCommentToBook(APIView):
+    """
+    API endpoint to add a comment to a book.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, book_id):
+        serializer = CommentSerializer(data=request.data)
+        book = get_object_or_404(Book, id=book_id)
+        if serializer.is_valid():
+            serializer.save(user=request.user, book=book)
+            return Response({'message': 'Comment added succesfully'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+       
+
 class BookDownloadAPIView(APIView):
     """
     API endpoint to download a book PDF by its ID.
@@ -152,7 +167,7 @@ class BookSearchAPIView(APIView):
         query = request.query_params.get('query', '')
         books = Book.objects.filter(title__icontains=query) if query else Book.objects.all()
         serializer = BookSerializer(books, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK) 
 
 
 class UserListAPIView(APIView):

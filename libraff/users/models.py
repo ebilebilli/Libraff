@@ -17,14 +17,14 @@ class Comments(models.Model):
     user = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name='comments')
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
     
-    context = models.TextField(max_length=1000)
+    content = models.TextField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def like_count(self):
         return f'{self.likes.count()}'
 
     def __str__(self):
-        return f'{self.context}'
+        return f'{self.content}'
 
 
 class LikeBook(models.Model):

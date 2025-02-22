@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import Comments
+
 
 class Book(models.Model):
     author = models.CharField(
@@ -29,4 +29,5 @@ class Book(models.Model):
 
     def __str__(self):
         return f'{self.title}'
+
 
