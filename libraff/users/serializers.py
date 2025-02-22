@@ -29,6 +29,31 @@ class CustomerUserRegisterDataSerializer(serializers.ModelSerializer):
         return user
 
 
+class CustomerUserAccountUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password_two = serializers.CharField(write_only=True, required=True)
+
+    model = CustomerUser
+    fields = '__all__'
+
+    def validate(self, data):
+        if data['password'] != data['password_two']:
+            raise serializers.ValidationError('Passwords must match')
+        return data
+    
+    def update(self, actual, validated_data):
+       actual.username = validated_data.get('username',actual.username)
+       actual.email = validated_data.get('email',actual.email)
+       actual.bio = validated_data.get('bio',actual.bio)
+       actual.avatar = validated_data.get('avatar',actual.avatar)
+
+       if 'password' in validated_data:
+           actual.set_password(validated_data['password'])  
+
+           actual.save()
+       return actual
+
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comments

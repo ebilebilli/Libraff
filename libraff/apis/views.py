@@ -34,6 +34,21 @@ class RegisterAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class AccountUpdateView(APIView):
+    """
+    API endpoint to update to user account .
+    """
+    permission_classes = [IsAuthenticated] 
+    
+    def patch(self, request):
+        user = request.user
+        serializer = CustomerUserAccountUpdateSerializer(user)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class BookListAPIView(APIView):
     """
     API endpoint to retrieve a list of books or add a new book.
@@ -106,7 +121,6 @@ class BookLikeAPIView(APIView):
 
         return Response({'detail': "Book liked"}, status=status.HTTP_200_OK)
 
-    
 
 class BookDownloadAPIView(APIView):
     """

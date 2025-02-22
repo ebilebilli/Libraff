@@ -7,6 +7,6 @@ class CustomerUserCreationForm(UserCreationForm):
         fields = ('username', 'email')
 
 
-class CustomerUserChangeFomr(UserCreationForm):
+class CustomerUserChangeFomr(UserChangeForm):
     model = CustomerUser
     fields = ('username', 'email', 'bio', 'avatar')
