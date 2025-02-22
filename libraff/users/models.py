@@ -43,3 +43,5 @@ class LikeComment(models.Model):
 
     class Meta:
         unique_together = ('user', 'comment')
+    
+   
