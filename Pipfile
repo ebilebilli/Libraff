@@ -8,6 +8,7 @@ djangorestframework = "*"
 django = "*"
 faker = "*"
 pillow = "*"
+drf-yasg = "*"
 
 [dev-packages]
 

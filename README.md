@@ -1,125 +1,94 @@
-# 📚 Book Library API
+📚 Book Library API
+A Django REST Framework based API for managing books, user profiles, comments, and likes. Users can search, download books, and interact through likes and comments.
 
-A **Django REST Framework** based API for managing books, user profiles, comments, and likes. Users can search, download books, and interact through likes and comments.
+🚀 Features
+Book Management:
 
-## 🚀 Features
+List, retrieve, create, update, and delete books.
+Like/unlike books.
+Download books as PDFs.
+Search books by title.
+User Management:
 
-- **Book Management**:
-  - List, retrieve, create, update, and delete books.
-  - Like/unlike books.
-  - Download books as PDFs.
-  - Search books by title.
+Register new users.
+Update user profiles.
+List all users.
+Comment System:
 
-- **User Management**:
-  - Register new users.
-  - Update user profiles.
-  - List all users.
+Add comments to books.
+View comments by users and books.
+Like/unlike comments.
+🛠️ Technologies Used
+Django (Python Web Framework)
+Django REST Framework (API Development)
+SQLite/PostgreSQL (Database)
+📄 Installation & Setup
+Clone the repository:
 
-- **Comment System**:
-  - Add comments to books.
-  - View comments by users and books.
-  - Like/unlike comments.
+bash
+Copy
+Edit
+git clone <repository_url>
+cd book-library-api
+Set up a virtual environment:
 
-## 🛠️ Technologies Used
+bash
+Copy
+Edit
+python -m venv env
+source env/bin/activate  # Mac/Linux
+env\Scripts\activate    # Windows
+Install dependencies:
 
-- **Django** (Python Web Framework)
-- **Django REST Framework** (API Development)
-- **SQLite/PostgreSQL** (Database)
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Apply database migrations:
 
-## 📄 Installation & Setup
+bash
+Copy
+Edit
+python manage.py migrate
+Create a superuser (optional for admin access):
 
-1. Clone the repository:
+bash
+Copy
+Edit
+python manage.py createsuperuser
+Start the development server:
 
-   ```bash
-   git clone <repository_url>
-   cd book-library-api
-   ```
+bash
+Copy
+Edit
+python manage.py runserver
 
-2. Set up a virtual environment:
+Category                 | Method | Endpoint                        | Description                            | Authentication Required
+-------------------------|--------|---------------------------------|----------------------------------------|-------------------------
+Authentication Endpoints | POST   | /login/                         | Obtain auth token                      | No
+                         | POST   | /register/                      | Register a new user                    | No
+Book Endpoints           | GET    | /books/                         | List all books (paginated)             | No
+                         | POST   | /books/                         | Add a new book                         | Yes
+                         | GET    | /book/<book_id>/                | Retrieve book details                  | Yes
+                         | PUT    | /book/<book_id>/                | Update book completely                 | Yes
+                         | PATCH  | /book/<book_id>/                | Partially update book                  | Yes
+                         | DELETE | /book/<book_id>/                | Delete a book                          | Yes
+                         | POST   | /book/<book_id>/like/           | Like/unlike a book                     | Yes
+                         | GET    | /book/<book_id>/download/       | Download book PDF                      | Yes
+                         | GET    | /books/search/?query=<str>      | Search books by title                  | No
+User Endpoints           | GET    | /users/                         | List all users (paginated)             | Yes
+                         | GET    | /user/<user_id>/                | Get user details                       | Yes
+                         | PATCH  | /user/<user_id>/                | Update user profile                    | Yes
+                         | GET    | /user/<user_id>/comments/       | List user's comments                   | Yes
+                         | GET    | /user/<user_id>/liked_books/    | List user's liked books                | Yes
+Comment Endpoints        | GET    | /book/<book_id>/comments/       | List book comments (paginated)         | Yes
+                         | POST   | /book/<book_id>/comments/       | Add comment to a book                  | Yes
+                         | GET    | /comment/likes/                 | List all liked comments                | Yes
 
-   ```bash
-   python -m venv env
-   source env/bin/activate  # Mac/Linux
-   env\Scripts\activate    # Windows
-   ```
-
-3. Install dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Apply database migrations:
-
-   ```bash
-   python manage.py migrate
-   ```
-
-5. Create a superuser (optional for admin access):
-
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-6. Start the development server:
-
-   ```bash
-   python manage.py runserver
-   ```
-
-## 📊 API Endpoints
-
-
-
-### Authentication Endpoints
-
-| Method | Endpoint      | Description               | Authentication Required |
-|--------|---------------|---------------------------|-------------------------|
-| POST   | `/login/`     | Obtain auth token         | No                      |
-| POST   | `/register/`  | Register a new user       | No                      |
-
----
-
-### 📚 Book Endpoints
-
-| Method | Endpoint                      | Description                          | Authentication Required |
-|--------|-------------------------------|--------------------------------------|-------------------------|
-| GET    | `/books/`                     | List all books (paginated)           | No                      |
-| POST   | `/books/`                     | Add a new book                       | Yes                     |
-| GET    | `/book/<book_id>/`            | Retrieve book details                | Yes                     |
-| PUT    | `/book/<book_id>/`            | Update book completely               | Yes                     |
-| PATCH  | `/book/<book_id>/`            | Partially update book                | Yes                     |
-| DELETE | `/book/<book_id>/`            | Delete a book                        | Yes                     |
-| POST   | `/book/<book_id>/like/`       | Like/unlike a book                   | Yes                     |
-| GET    | `/book/<book_id>/download/`   | Download book PDF                    | Yes                     |
-| GET    | `/books/search/?query=<str>`  | Search books by title                | No                      |
-
----
-
-### User Endpoints
-
-| Method | Endpoint                      | Description                          | Authentication Required |
-|--------|-------------------------------|--------------------------------------|-------------------------|
-| GET    | `/users/`                     | List all users (paginated)           | Yes                     |
-| GET    | `/user/<user_id>/`            | Get user details                     | Yes                     |
-| PATCH  | `/user/<user_id>/`            | Update user profile                  | Yes                     |
-| GET    | `/user/<user_id>/comments/`   | List user's comments                 | Yes                     |
-| GET    | `/user/<user_id>/liked_books/`| List user's liked books              | Yes                     |
-
----
-
-### Comment Endpoints
-
-| Method | Endpoint                      | Description                          | Authentication Required |
-|--------|-------------------------------|--------------------------------------|-------------------------|
-| GET    | `/book/<book_id>/comments/`   | List book comments (paginated)       | Yes                     |
-| POST   | `/book/<book_id>/comments/`   | Add comment to a book                | Yes                     |
-| GET    | `/comment/likes/`             | List all liked comments              | Yes                     |
-
-## 📚 Models
-
-### Book Model
-```python
+Book Model
+python
+Copy
+Edit
 class Book(models.Model):
     author = models.CharField(max_length=255, null=True, blank=True)
     title = models.CharField(max_length=255, null=True, blank=True)
@@ -129,30 +98,25 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
-```
-
-### User Model
-```python
+User Model
+python
+Copy
+Edit
 class CustomerUser(AbstractUser):
     email = models.EmailField(unique=True, null=True, blank=True)
     bio = models.TextField(max_length=550, null=True, blank=True)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-```
-
-### Comment Model
-```python
+Comment Model
+python
+Copy
+Edit
 class Comments(models.Model):
     user = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name='comments')
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
     content = models.TextField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
-```
+📜 License
+This project is licensed under the MIT License.
 
-## 📜 License
-
-This project is licensed under the **MIT License**.
-
-## 👨‍💻 Author
-
-Developed by **Abil Abilli** 🚀
-
+👨‍💻 Author
+Developed by Abil Abilli 🚀
