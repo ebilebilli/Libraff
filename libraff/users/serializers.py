@@ -55,10 +55,12 @@ class CustomerUserAccountUpdateSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.username', read_only=True)
     class Meta:
         model = Comments
-        fields = '__all__'
-
+        fields = [ 'content', 'created_at', 'user_name']
+        read_only_fields = ['created_at', 'user', 'book', 'user_name']
+        
 
 class LikeBookSerializer(serializers.ModelSerializer):
     class Meta:

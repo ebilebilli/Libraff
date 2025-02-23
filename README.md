@@ -69,37 +69,52 @@ A **Django REST Framework** based API for managing books, user profiles, comment
 
 ## 📊 API Endpoints
 
+
+
+### Authentication Endpoints
+
+| Method | Endpoint      | Description               | Authentication Required |
+|--------|---------------|---------------------------|-------------------------|
+| POST   | `/login/`     | Obtain auth token         | No                      |
+| POST   | `/register/`  | Register a new user       | No                      |
+
+---
+
 ### 📚 Book Endpoints
 
-| Method   | Endpoint                  | Description             |
-|----------|---------------------------|-------------------------|
-| `GET`    | `/books/`                 | List all books          |
-| `POST`   | `/books/`                 | Add a new book          |
-| `GET`    | `/book/<book_id>/`        | Retrieve book details   |
-| `PUT`    | `/book/<book_id>/`        | Update book details     |
-| `PATCH`  | `/book/<book_id>/`        | Partially update book   |
-| `DELETE` | `/book/<book_id>/`        | Delete a book           |
-| `POST`   | `/book/<book_id>/like/`   | Like/unlike a book      |
-| `GET`    | `/book/<book_id>/download`| Download book PDF       |
-| `GET`    | `/books/search/?query=<>` | Search books by title   |
+| Method | Endpoint                      | Description                          | Authentication Required |
+|--------|-------------------------------|--------------------------------------|-------------------------|
+| GET    | `/books/`                     | List all books (paginated)           | No                      |
+| POST   | `/books/`                     | Add a new book                       | Yes                     |
+| GET    | `/book/<book_id>/`            | Retrieve book details                | Yes                     |
+| PUT    | `/book/<book_id>/`            | Update book completely               | Yes                     |
+| PATCH  | `/book/<book_id>/`            | Partially update book                | Yes                     |
+| DELETE | `/book/<book_id>/`            | Delete a book                        | Yes                     |
+| POST   | `/book/<book_id>/like/`       | Like/unlike a book                   | Yes                     |
+| GET    | `/book/<book_id>/download/`   | Download book PDF                    | Yes                     |
+| GET    | `/books/search/?query=<str>`  | Search books by title                | No                      |
 
-### 👤 User Endpoints
+---
 
-| Method   | Endpoint                  | Description              |
-|----------|---------------------------|--------------------------|
-| `POST`   | `/register/`              | Register a new user      |
-| `PATCH`  | `/account/update/`        | Update user profile      |
-| `GET`    | `/users/`                 | List all users          |
+### User Endpoints
 
-### 💬 Comment Endpoints
+| Method | Endpoint                      | Description                          | Authentication Required |
+|--------|-------------------------------|--------------------------------------|-------------------------|
+| GET    | `/users/`                     | List all users (paginated)           | Yes                     |
+| GET    | `/user/<user_id>/`            | Get user details                     | Yes                     |
+| PATCH  | `/user/<user_id>/`            | Update user profile                  | Yes                     |
+| GET    | `/user/<user_id>/comments/`   | List user's comments                 | Yes                     |
+| GET    | `/user/<user_id>/liked_books/`| List user's liked books              | Yes                     |
 
-| Method   | Endpoint                      | Description                   |
-|----------|-------------------------------|-------------------------------|
-| `POST`   | `/book/<book_id>/comment/`    | Add a comment to a book       |
-| `GET`    | `/user/<user_id>/comments/`   | Get comments by a user        |
-| `GET`    | `/book/<book_id>/comments/`   | Get comments for a book       |
-| `GET`    | `/comments/likes/`            | List all liked comments       |
-| `GET`    | `/books/likes/`               | List all liked books          |
+---
+
+### Comment Endpoints
+
+| Method | Endpoint                      | Description                          | Authentication Required |
+|--------|-------------------------------|--------------------------------------|-------------------------|
+| GET    | `/book/<book_id>/comments/`   | List book comments (paginated)       | Yes                     |
+| POST   | `/book/<book_id>/comments/`   | Add comment to a book                | Yes                     |
+| GET    | `/comment/likes/`             | List all liked comments              | Yes                     |
 
 ## 📚 Models
 
@@ -129,7 +144,7 @@ class CustomerUser(AbstractUser):
 class Comments(models.Model):
     user = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name='comments')
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
-    context = models.TextField(max_length=1000)
+    content = models.TextField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
 ```
 
