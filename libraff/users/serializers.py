@@ -27,18 +27,18 @@ class CustomerUserRegisterDataSerializer(serializers.ModelSerializer):
         model = CustomerUser
         fields = '__all__'
 
-        def validate(self, data):
-            if data['password'] != data['password_two']:
-                raise serializers.ValidationError('Passwords must match')
-            return data
+    def validate(self, data):
+        if data['password'] != data['password_two']:
+            raise serializers.ValidationError('Passwords must match')
+        return data
             
-        def create(self, validated_data):
-            user = CustomerUser.objects.create_user(
-                username=validated_data['username'],
-                email=validated_data['email'],
-                password=validated_data['password']
-            )
-            return user
+    def create(self, validated_data):
+        user = CustomerUser.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+        return user
 
 
 class CustomerUserAccountUpdateSerializer(serializers.ModelSerializer):
@@ -50,22 +50,22 @@ class CustomerUserAccountUpdateSerializer(serializers.ModelSerializer):
         fields = '__all__'
    
 
-        def validate(self, data):
-            if data['password'] != data['password_two']:
-                raise serializers.ValidationError('Passwords must match')
-            return data
+    def validate(self, data):
+        if data['password'] != data['password_two']:
+            raise serializers.ValidationError('Passwords must match')
+        return data
         
-        def update(self, actual, validated_data):
-            actual.username = validated_data.get('username',actual.username)
-            actual.email = validated_data.get('email',actual.email)
-            actual.bio = validated_data.get('bio',actual.bio)
-            actual.avatar = validated_data.get('avatar',actual.avatar)
+    def update(self, actual, validated_data):
+        actual.username = validated_data.get('username',actual.username)
+        actual.email = validated_data.get('email',actual.email)
+        actual.bio = validated_data.get('bio',actual.bio)
+        actual.avatar = validated_data.get('avatar',actual.avatar)
 
-            if 'password' in validated_data:
-                actual.set_password(validated_data['password'])  
+        if 'password' in validated_data:
+            actual.set_password(validated_data['password'])  
 
-                actual.save()
-            return actual
+            actual.save()
+        return actual
 
 
 class CommentSerializer(serializers.ModelSerializer):

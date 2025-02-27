@@ -1,8 +1,7 @@
 from rest_framework.views import APIView, Response, status
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import IsAuthenticated, BasePermission, AllowAny
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import redirect
 from rest_framework.authentication import TokenAuthentication
@@ -20,19 +19,24 @@ __all__ = [
     'UserCommentListAPIView', 'LikedBookListAPIView',
     'CommentLikeListAPIView', 'RegisterAPIView',
     'CommentManagementAPIView', 'AccountDetailAPIView',
-    'LoginAPIView', 
+    'LoginAPIView', 'UserSearchAPIView',
+    'BookCategoryListAPIView', 'BookListForCategoryAPIView'
 ]
+
 
 class HeHasPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user == obj.user or request.user.is_staff
 
+
 class Pagination(PageNumberPagination):
     """Custom pagination class with default page size of 10."""
     page_size = 10
 
+
 class RegisterAPIView(APIView):
     """APIView for user registration."""
+    permission_class = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         """Handle POST requests to create a new user."""
@@ -48,7 +52,14 @@ class RegisterAPIView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class LoginAPIView(APIView):
+    """
+    User login API.
+
+    POST: Accepts credentials and returns a token on success.
+    """
+    permission_class = [AllowAny]
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -57,9 +68,15 @@ class LoginAPIView(APIView):
             return Response({'message': 'Login successful', 'token': token.key}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class LogoutAPIView(APIView):
+    """
+    User logout API.
+
+    POST: Logs out the user by deleting the token.
+    """
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_class = [IsAuthenticated]
 
     def post(self, request):
         token = request.auth
@@ -68,8 +85,49 @@ class LogoutAPIView(APIView):
             return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
         return Response({'message': 'No active account found'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class BookCategoryListAPIView(APIView):
+    """
+    List book categories API.
+
+    GET: Returns all book categories.
+    """
+    permission_class = [AllowAny]
+
+    def get(self, request):
+        category = BookCategory.objects.all()
+        serializer = BookCategorySerializer(category, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class BookListForCategoryAPIView(APIView):
+    """
+    API View to retrieve a paginated list of books filtered by category.
+
+    **GET**: 
+    - `category_id`: The ID of the category to filter books by.
+    - Returns a paginated list of books belonging to the specified category, sorted by likes in descending order.
+    - If no books are found in the specified category, returns a `404 Not Found` status with a message indicating no books are available.
+
+    """
+    permission_class = [AllowAny]
+    pagination_class = Pagination
+
+    def get(self, request, category_id):
+        category = get_object_or_404(BookCategory, id=category_id)
+        books = Book.objects.filter(category=category,).order_by('-like')
+        pagination = self.pagination_class()
+
+        if books.exists():
+            result_page = pagination.paginate_queryset(books, request)
+            serializer = BookSerializer(books, many=True)
+            return pagination.get_paginated_response(serializer.data)
+        return Response({'Message': 'There are no books in this category'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class BookListAPIView(APIView):
     """APIView for listing and creating books."""
+    permission_class = [AllowAny]
     pagination_class = Pagination
 
     def get(self, request):
@@ -88,15 +146,14 @@ class BookListAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class BookDetailAPIView(APIView):
     """APIView for retrieving, updating, or deleting a specific book."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_class = [IsAuthenticated]
 
     def get(self, request, book_id):
         """Retrieve details of a specific book by ID."""
-        if not request.user.is_authenticated:
-            return redirect('/register/')
         book = get_object_or_404(Book, id=book_id)
         serializer = BookSerializer(book)
         return Response(serializer.data)
@@ -118,10 +175,11 @@ class BookDetailAPIView(APIView):
         book.save()
         return Response({'detail': "Book liked"}, status=status.HTTP_200_OK)
 
+
 class CommentManagementAPIView(APIView):
     """APIView for adding and retrieving comments for a specific book."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, HeHasPermission]
+    permission_class = [IsAuthenticated, HeHasPermission]
     pagination_class = Pagination
 
     def post(self, request, book_id):
@@ -151,10 +209,11 @@ class CommentManagementAPIView(APIView):
             return Response({'message': 'Comment deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         return Response({'message': 'There is not such message'}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class BookDownloadAPIView(APIView):
     """APIView for downloading book PDFs."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_class = [IsAuthenticated]
 
     def get(self, request, book_id):
         """Download the PDF of a specific book."""
@@ -164,8 +223,10 @@ class BookDownloadAPIView(APIView):
             return response
         return Response({'error': 'File not available'}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class BookSearchAPIView(APIView):
     """APIView for searching books by title."""
+    permission_class = [AllowAny]
     pagination_class = Pagination
 
     def get(self, request):
@@ -177,12 +238,31 @@ class BookSearchAPIView(APIView):
         if books.exists():
             serializer = BookSerializer(result_page, many=True)
             return pagination.get_paginated_response(serializer.data)
-        return Response({'Message': 'There is not such book'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'Message': 'There is not such book'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class UserSearchAPIView(APIView):
+    """APIView for searching users by title."""
+    authentication_classes = [TokenAuthentication]
+    permission_class = [IsAuthenticated]
+    pagination_class = Pagination
+
+    def get(self, request):
+        """Retrieve a paginated list of user matching the search query."""
+        query = request.query_params.get('query', '')
+        users = CustomerUser.objects.filter(username__icontains=query) if query else CustomerUser.objects.all()
+        pagination = self.pagination_class()
+        result_page = pagination.paginate_queryset(users, request)
+        if users.exists():
+            serializer = CustomerUser(result_page, many=True)
+            return pagination.get_paginated_response(serializer.data)
+        return Response({'Message': 'There is not such user'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserListAPIView(APIView):
     """APIView for listing all users."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_class = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request):
@@ -195,10 +275,11 @@ class UserListAPIView(APIView):
             return pagination.get_paginated_response(serializer.data)
         return Response({'Message': 'No users found'}, status=status.HTTP_204_NO_CONTENT)
 
+
 class AccountDetailAPIView(APIView):
     """APIView for retrieving and updating user account details."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, HeHasPermission]
+    permission_class = [IsAuthenticated, HeHasPermission]
 
     def get(self, request, user_id):
         """Retrieve details of a specific user."""
@@ -215,12 +296,13 @@ class AccountDetailAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
 
 class UserCommentListAPIView(APIView):
     """APIView for retrieving comments by a specific user."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_class = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request, user_id):
@@ -233,10 +315,11 @@ class UserCommentListAPIView(APIView):
             return pagination.get_paginated_response(serializer.data)
         return Response({'Message': 'No comments found'}, status=status.HTTP_204_NO_CONTENT)
 
+
 class LikedBookListAPIView(APIView):
     """APIView for retrieving books liked by a specific user."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_class = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request, user_id):
@@ -248,10 +331,11 @@ class LikedBookListAPIView(APIView):
         serializer = LikeBookSerializer(result_page, many=True)
         return pagination.get_paginated_response(serializer.data)
 
+
 class CommentLikeListAPIView(APIView):
     """APIView for retrieving all liked comments."""
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_class = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request):
