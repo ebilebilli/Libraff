@@ -21,6 +21,11 @@ class Book(models.Model):
         null=True, 
         blank=True
     )
+    context = models.CharField(
+        max_length=255, 
+        null=True, 
+        blank=True
+    )
     price = models.PositiveSmallIntegerField(
         null=True,
         blank=True

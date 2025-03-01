@@ -36,7 +36,7 @@ class Pagination(PageNumberPagination):
 
 class RegisterAPIView(APIView):
     """APIView for user registration."""
-    permission_class = [AllowAny]
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         """Handle POST requests to create a new user."""
@@ -59,7 +59,7 @@ class LoginAPIView(APIView):
 
     POST: Accepts credentials and returns a token on success.
     """
-    permission_class = [AllowAny]
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -76,7 +76,7 @@ class LogoutAPIView(APIView):
     POST: Logs out the user by deleting the token.
     """
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         token = request.auth
@@ -92,7 +92,7 @@ class BookCategoryListAPIView(APIView):
 
     GET: Returns all book categories.
     """
-    permission_class = [AllowAny]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         category = BookCategory.objects.all()
@@ -110,7 +110,7 @@ class BookListForCategoryAPIView(APIView):
     - If no books are found in the specified category, returns a `404 Not Found` status with a message indicating no books are available.
 
     """
-    permission_class = [AllowAny]
+    permission_classes = [AllowAny]
     pagination_class = Pagination
 
     def get(self, request, category_id):
@@ -127,7 +127,7 @@ class BookListForCategoryAPIView(APIView):
 
 class BookListAPIView(APIView):
     """APIView for listing and creating books."""
-    permission_class = [AllowAny]
+    permission_classes = [AllowAny]
     pagination_class = Pagination
 
     def get(self, request):
@@ -150,7 +150,7 @@ class BookListAPIView(APIView):
 class BookDetailAPIView(APIView):
     """APIView for retrieving, updating, or deleting a specific book."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, book_id):
         """Retrieve details of a specific book by ID."""
@@ -179,7 +179,7 @@ class BookDetailAPIView(APIView):
 class CommentManagementAPIView(APIView):
     """APIView for adding and retrieving comments for a specific book."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated, HeHasPermission]
+    permission_classes = [IsAuthenticated, HeHasPermission]
     pagination_class = Pagination
 
     def post(self, request, book_id):
@@ -208,12 +208,20 @@ class CommentManagementAPIView(APIView):
             comment.delete()
             return Response({'message': 'Comment deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         return Response({'message': 'There is not such message'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, comment_id):
+        comment = get_object_or_404(Comments, id=comment_id)
+        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BookDownloadAPIView(APIView):
     """APIView for downloading book PDFs."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, book_id):
         """Download the PDF of a specific book."""
@@ -226,7 +234,7 @@ class BookDownloadAPIView(APIView):
 
 class BookSearchAPIView(APIView):
     """APIView for searching books by title."""
-    permission_class = [AllowAny]
+    permission_classes = [AllowAny]
     pagination_class = Pagination
 
     def get(self, request):
@@ -244,7 +252,7 @@ class BookSearchAPIView(APIView):
 class UserSearchAPIView(APIView):
     """APIView for searching users by title."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request):
@@ -262,7 +270,7 @@ class UserSearchAPIView(APIView):
 class UserListAPIView(APIView):
     """APIView for listing all users."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request):
@@ -279,7 +287,7 @@ class UserListAPIView(APIView):
 class AccountDetailAPIView(APIView):
     """APIView for retrieving and updating user account details."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated, HeHasPermission]
+    permission_classes = [IsAuthenticated, HeHasPermission]
 
     def get(self, request, user_id):
         """Retrieve details of a specific user."""
@@ -302,7 +310,7 @@ class AccountDetailAPIView(APIView):
 class UserCommentListAPIView(APIView):
     """APIView for retrieving comments by a specific user."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request, user_id):
@@ -319,7 +327,7 @@ class UserCommentListAPIView(APIView):
 class LikedBookListAPIView(APIView):
     """APIView for retrieving books liked by a specific user."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request, user_id):
@@ -335,7 +343,7 @@ class LikedBookListAPIView(APIView):
 class CommentLikeListAPIView(APIView):
     """APIView for retrieving all liked comments."""
     authentication_classes = [TokenAuthentication]
-    permission_class = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     pagination_class = Pagination
 
     def get(self, request):
