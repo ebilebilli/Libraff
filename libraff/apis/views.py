@@ -7,7 +7,7 @@ from rest_framework.pagination import PageNumberPagination
 from utils.helpers import send_mail_func
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from django.core.mail import send_mail
+
 
 from books.serializers import *
 from books.models import Book
