@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from rest_framework.permissions import IsAuthenticated, BasePermission, AllowAny
 from rest_framework.pagination import PageNumberPagination
-from django.shortcuts import redirect
+from utils.helpers import send_mail_func
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from django.core.mail import send_mail
@@ -46,14 +46,7 @@ class RegisterAPIView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             token, created = Token.objects.get_or_create(user=user)
-            
-            send_mail(
-                f'{user.username}, your account created successfully.',
-                'Welcome to Libraff',
-                'ebilebilli3@gmail.com',
-                [user.email],
-                fail_silently=True                   
-            )
+            send_mail_func(user_name=user.username, user_email=user.email)
 
             return Response({
                 'message': 'Profile created successfully',

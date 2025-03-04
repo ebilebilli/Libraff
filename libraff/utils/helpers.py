@@ -1,9 +1,10 @@
 import faker
 import random
 from books.models import Book, BookCategory
+from django.core.mail import send_mail 
 
-__all__ = ['fake_data_gen'
-
+__all__ = ['fake_data_gen',
+           'send_mail_func'
 ]
 
 fake = faker.Faker('az_AZ')
@@ -28,3 +29,12 @@ def fake_data_gen(number:int = 1):
             pdf = fake.url()
         )
     print (f'{number} fake data created')
+
+def send_mail_func(user_name: str, user_email: str):
+     send_mail(
+                f'{user_name}, your account created successfully.',
+                'Welcome to Libraff',
+                'ebilebilli3@gmail.com',
+                [user_email],
+                fail_silently=True                   
+            )
