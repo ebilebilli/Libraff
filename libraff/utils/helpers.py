@@ -2,6 +2,9 @@ import faker
 import random
 from books.models import Book, BookCategory
 
+__all__ = ['fake_data_gen'
+
+]
 
 fake = faker.Faker('az_AZ')
 

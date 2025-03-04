@@ -9,6 +9,7 @@ django = "*"
 faker = "*"
 pillow = "*"
 drf-yasg = "*"
+dotenv = "*"
 
 [dev-packages]
 

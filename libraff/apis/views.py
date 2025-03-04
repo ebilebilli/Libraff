@@ -1,3 +1,4 @@
+import os
 from rest_framework.views import APIView, Response, status
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
@@ -6,6 +7,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import redirect
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
+from django.core.mail import send_mail
 
 from books.serializers import *
 from books.models import Book
@@ -44,6 +46,15 @@ class RegisterAPIView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             token, created = Token.objects.get_or_create(user=user)
+            
+            send_mail(
+                f'{user.username}, your account created successfully.',
+                'Welcome to Libraff',
+                'ebilebilli3@gmail.com',
+                [user.email],
+                fail_silently=True                   
+            )
+
             return Response({
                 'message': 'Profile created successfully',
                 'username': user.username,
