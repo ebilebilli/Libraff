@@ -203,7 +203,7 @@ class CommentManagementAPIView(APIView):
         if comment.exists():
             serializer = CommentSerializer(result_page, many=True)
             return pagination.get_paginated_response(serializer.data)
-        return Response({'Message': 'There is no any comment yet'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'Message': 'There is no any comment yet'}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, comment_id):
         comment = get_object_or_404(Comments, id=comment_id)
@@ -285,7 +285,7 @@ class UserListAPIView(APIView):
         if user.exists():
             serializer = UserSerializer(result_page, many=True)
             return pagination.get_paginated_response(serializer.data)
-        return Response({'Message': 'No users found'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'Message': 'No users found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AccountDetailAPIView(APIView):
@@ -325,7 +325,7 @@ class UserCommentListAPIView(APIView):
             result_page = pagination.paginate_queryset(comment, request)
             serializer = CommentSerializer(result_page, many=True)
             return pagination.get_paginated_response(serializer.data)
-        return Response({'Message': 'No comments found'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'Message': 'No comments found'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LikedBookListAPIView(APIView):
