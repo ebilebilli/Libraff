@@ -11,6 +11,23 @@ class BookCategory(models.Model):
 class Book(models.Model):
     category = models.ForeignKey(BookCategory, on_delete=models.CASCADE)
 
+    WANT_TO_READ = 'Want to Read'
+    READING = 'Reading'
+    FINISHED = 'Finished'
+    UNREAD = 'Not Read'
+    
+    STATUS_LIST = [
+        (WANT_TO_READ, 'Want to Read'),
+        (READING, 'Reading'),
+        (FINISHED, 'Finished'),
+        (UNREAD, 'Unread')
+    ]
+
+    status = models.CharField(
+        max_length=25,
+        default=UNREAD,
+        choices=STATUS_LIST
+    )
     author = models.CharField(
         max_length=255,
         null=True,
@@ -22,7 +39,7 @@ class Book(models.Model):
         blank=True
     )
     context = models.CharField(
-        max_length=255, 
+        max_length=1000, 
         null=True, 
         blank=True
     )

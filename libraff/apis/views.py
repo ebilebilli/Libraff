@@ -1,4 +1,3 @@
-import os
 from rest_framework.views import APIView, Response, status
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
@@ -124,7 +123,7 @@ class BookListForCategoryAPIView(APIView):
 
         if books.exists():
             result_page = pagination.paginate_queryset(books, request)
-            serializer = BookSerializer(books, many=True)
+            serializer = BookSerializer(result_page, many=True)
             return pagination.get_paginated_response(serializer.data)
         return Response({'Message': 'There are no books in this category'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -141,14 +140,6 @@ class BookListAPIView(APIView):
         result_page = pagination.paginate_queryset(books, request)
         serializer = BookSerializer(result_page, many=True)
         return pagination.get_paginated_response(serializer.data)
-
-    def post(self, request, *args, **kwargs):
-        """Create a new book."""
-        serializer = CreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BookDetailAPIView(APIView):
@@ -178,6 +169,15 @@ class BookDetailAPIView(APIView):
         book.like += 1
         book.save()
         return Response({'detail': "Book liked"}, status=status.HTTP_200_OK)
+    
+    def patch(request, book_id):
+        """Change status of a specific book."""
+        book = get_object_or_404(Book, id=book_id)
+        serializer = ChangeBookStatusSerializer(book, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CommentManagementAPIView(APIView):

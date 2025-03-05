@@ -14,7 +14,7 @@ class BookSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CreateSerializer(serializers.ModelSerializer):
+class ChangeBookStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        exclude = ['id']
+        fields = ['status']
