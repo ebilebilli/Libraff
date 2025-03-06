@@ -170,7 +170,7 @@ class BookDetailAPIView(APIView):
         book.save()
         return Response({'detail': "Book liked"}, status=status.HTTP_200_OK)
     
-    def patch(request, book_id):
+    def patch(self, request, book_id):
         """Change status of a specific book."""
         book = get_object_or_404(Book, id=book_id)
         serializer = ChangeBookStatusSerializer(book, data=request.data, partial=True)
