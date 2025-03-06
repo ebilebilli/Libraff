@@ -3,9 +3,9 @@ from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from rest_framework.permissions import IsAuthenticated, BasePermission, AllowAny
 from rest_framework.pagination import PageNumberPagination
-from utils.helpers import send_mail_func
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
+from django.db import transaction
 
 
 from books.serializers import *
@@ -42,10 +42,11 @@ class RegisterAPIView(APIView):
     def post(self, request, *args, **kwargs):
         """Handle POST requests to create a new user."""
         serializer = CustomerUserRegisterDataSerializer(data=request.data)
+        
         if serializer.is_valid():
-            user = serializer.save()
-            token, created = Token.objects.get_or_create(user=user)
-            send_mail_func(user_name=user.username, user_email=user.email)
+            with transaction.atomic():
+                user = serializer.save()
+                token, created = Token.objects.get_or_create(user=user)
 
             return Response({
                 'message': 'Profile created successfully',
