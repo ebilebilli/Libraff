@@ -19,10 +19,38 @@ A Django REST Framework based API for managing books, user profiles, comments, a
 - View comments by users and books.
 - Like/unlike comments.
 
-🛠️ **Technologies Used**
-- Django (Python Web Framework)
-- Django REST Framework (API Development)
-- SQLite/PostgreSQL (Database)
+🛠️ Technologies Used
+Django 5.1.6 (Python Web Framework)
+
+Django REST Framework (API Development)
+
+SQLite/PostgreSQL (Database Options)
+
+Redis (Caching and Celery Backend)
+
+Celery (Asynchronous Task Processing)
+
+Django Channels (WebSocket Support)
+
+DRF-YASG (API Documentation with Swagger/OpenAPI)
+
+
+New Updates (March 2025)
+API Versioning: Added support for v1/ and v2/ endpoints.
+
+Rate Limiting: Prevent abuse with throttling for unauthenticated and authenticated users.
+
+OAuth2 Authentication: Optional Google/GitHub login alongside token-based auth.
+
+Caching: Improved performance with Redis caching for frequently accessed endpoints.
+
+WebSocket Support: Real-time notifications for likes and comments (via Django Channels).
+
+AI-Powered Search: Integrated basic AI-driven recommendations for books.
+
+
+
+
 
 📄 **Installation & Setup**
 
@@ -64,6 +92,16 @@ python manage.py createsuperuser
 ```bash
 python manage.py runserver
 ```
+
+7.Run Celery for Background Tasks (optional):
+bash
+
+celery -A libraff worker -l info
+
+8.Run Redis (for caching and Celery):
+Ensure Redis is installed and running locally (redis-server).
+
+
 
 ---
 
