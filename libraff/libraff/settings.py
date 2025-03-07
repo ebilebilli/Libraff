@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     'celery',
-    'redis'
+    'redis',
     'django_celery_results',
 ]
 
@@ -175,3 +175,6 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 CELERY_RESULT_BACKEND = 'django-cache'
 CELERY_CACHE_BACKEND = 'default'
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"

@@ -11,8 +11,8 @@ pillow = "*"
 drf-yasg = "*"
 dotenv = "*"
 celery = {extras = ["redis"], version = "*"}
-django-celery-results = "*"
 redis = "*"
+django-celery-results = "*"
 
 [dev-packages]
 

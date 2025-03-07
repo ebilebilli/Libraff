@@ -4,8 +4,9 @@ from django.dispatch import receiver
 from users.models import CustomerUser
 from .tasks import send_mail_func
 
+
 @receiver(post_save, sender=CustomerUser)
 def send_mail_signal(sender, instance, created, **kwargs):
     if created:
-        send_mail_func(instance.username, instance.email)
+        send_mail_func.delay(instance.username, instance.email)
 
