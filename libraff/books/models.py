@@ -23,6 +23,11 @@ class Book(models.Model):
         (UNREAD, 'Unread')
     ]
 
+    book_image = models.ImageField(
+        upload_to='book_images/', 
+        null=True,
+        blank=True
+    )
     status = models.CharField(
         max_length=25,
         default=UNREAD,
