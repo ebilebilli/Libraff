@@ -21,7 +21,8 @@ __all__ = [
     'CommentLikeListAPIView', 'RegisterAPIView',
     'CommentManagementAPIView', 'AccountDetailAPIView',
     'LoginAPIView', 'UserSearchAPIView',
-    'BookCategoryListAPIView', 'BookListForCategoryAPIView'
+    'BookCategoryListAPIView', 'BookListForCategoryAPIView',
+    'BookFilterAPIView'
 ]
 
 
@@ -253,6 +254,37 @@ class BookSearchAPIView(APIView):
             return pagination.get_paginated_response(serializer.data)
         return Response({'Message': 'There is not such book'}, status=status.HTTP_404_NOT_FOUND)
 
+
+class BookFilterAPIView(APIView):
+    permission_classes = [AllowAny]
+    pagination_class = Pagination
+
+    def get(self, request, *args, **kwargs):
+        books = Book.objects.all()
+        pagination = self.pagination_class()
+        data = request.GET
+        price_from = data.get('price_from')
+        price_to = data.get('price_to')
+        for_category = data.get('category')
+        for_author = data.get('author')
+        for_context = data.get('context')
+
+        if price_from is not None:
+            books = books.filter(price__gte=price_from)
+        if price_to is not None:
+            books = books.filter(price__lte=price_to)
+        if for_category is not None:
+            books = books.filter(category__icontains=for_category)
+        if for_author is not None:
+            books = books.filter(author__icontains=for_author)
+        if for_context is not None:
+            books = books.filter(context__icontains=for_context)
+        
+        
+        result_page = pagination.paginate_queryset(books)
+        serializer = BookSerializer(result_page)
+        return pagination.get_paginated_response(serializer)
+        
 
 class UserSearchAPIView(APIView):
     """APIView for searching users by title."""
