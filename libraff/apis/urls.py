@@ -14,7 +14,6 @@ urlpatterns = [
     path('logout/', LogoutAPIView.as_view(), name='logout'),
     path('register/', RegisterAPIView.as_view(), name='register'),
     path('users/', UserListAPIView.as_view(), name='users'),
-    path('users/search/', UserSearchAPIView.as_view(), name='user-search'),
     path('user/<int:user_id>/', AccountDetailAPIView.as_view(), name='user-account'),
 
     #Book endpoints:
