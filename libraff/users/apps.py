@@ -5,5 +5,5 @@ class UsersConfig(AppConfig):
     name = 'users'
 
     def ready(self):
-        import utils.signals
+        import users.signals
         

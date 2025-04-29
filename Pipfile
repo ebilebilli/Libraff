@@ -13,6 +13,8 @@ dotenv = "*"
 celery = {extras = ["redis"], version = "*"}
 redis = "*"
 django-celery-results = "*"
+djangorestframework-simplejwt = "*"
+django-redis = "*"
 
 [dev-packages]
 

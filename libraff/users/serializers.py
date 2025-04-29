@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from .models import *
 from django.contrib.auth.password_validation import validate_password
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomerUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomerUser
         fields = '__all__'
@@ -19,7 +19,7 @@ class LoginSerializer(serializers.Serializer):
            return user
         raise serializers.ValidationError('Invalid username or password')
 
-class CustomerUserRegisterDataSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password_two = serializers.CharField(write_only=True, required=True)
 
@@ -41,7 +41,7 @@ class CustomerUserRegisterDataSerializer(serializers.ModelSerializer):
         return user
 
 
-class CustomerUserAccountUpdateSerializer(serializers.ModelSerializer):
+class AccountUpdateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password_two = serializers.CharField(write_only=True, required=True)
     
@@ -68,21 +68,3 @@ class CustomerUserAccountUpdateSerializer(serializers.ModelSerializer):
         return actual
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.username', read_only=True)
-    class Meta:
-        model = Comments
-        fields = [ 'content', 'created_at', 'user_name']
-        read_only_fields = ['created_at', 'user', 'book', 'user_name']
-        
-
-class LikeBookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LikeBook
-        fields = '__all__'
-
-
-class LikeCommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LikeComment
-        fields = '__all__'
