@@ -62,7 +62,7 @@ class BookListAPIView(APIView):
             return Response(cached_data, status=status.HTTP_200_OK)
         
         try:
-            books = Book.objects.all()
+            books = Book.objects.all().order_by('-created_at')
             serializer = BookCategorySerializer(books, many=True)
             cache.set(cache_key, serializer.data, timeout=CACHETIMEOUT)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -124,7 +124,7 @@ class BookSearchAPIView(APIView):
         if cached_data:
             return Response(cached_data, status=status.HTTP_200_OK)
 
-        books = Book.objects.filter(title__icontains=query) if query else Book.objects.all()
+        books = Book.objects.filter(title__icontains=query).order_by('-created_at') if query else Book.objects.all()
         pagination = self.pagination_class()
         result_page = pagination.paginate_queryset(books, request)
         serializer = BookSerializer(result_page, many=True)
