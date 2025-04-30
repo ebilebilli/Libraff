@@ -35,8 +35,8 @@ class BookListForCategoryAPIView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request, category_id):
-        page = request.query_params.get('page', '1')
-        page_size = request.query_params.get('page_size', '10')
+        page = int(request.query_params.get('page', '1'))
+        page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'Book_list_for_category_{category_id}_page_{page}_size_{page_size}'
         cached_data = cache.get(cache_key)
         if cached_data:
@@ -86,18 +86,16 @@ class BookDetailAPIView(APIView):
         cache.set(cache_key, serializer.data, timeout=CACHETIMEOUT)
         return Response(serializer.data)
        
-
     def patch(self, request, book_id):
         user = request.user
         book = get_object_or_404(Book, id=book_id)
-        book_status = UserBookStatus.objects.get_or_create(user=user, book=book)
-        serializer = UserBookStatusSerializer(book_status, data=request.data, partial=True)
+        book_status = UserBookStatus.objects.get_or_create(user=user, book=book, )
+        serializer = UserBookStatusSerializer(book_status, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
        
         
-   
 class BookDownloadAPIView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -133,7 +131,6 @@ class BookSearchAPIView(APIView):
         return Response(paginated_response, status=status.HTTP_200_OK)
        
 
-
 class BookFilterAPIView(APIView):
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
@@ -146,8 +143,8 @@ class BookFilterAPIView(APIView):
         for_category = data.get('category')
         for_author = data.get('author')
         for_context = data.get('context')
-        page = data.get('page', '1')
-        page_size = data.get('page_size', '10')
+        page = int(request.query_params.get('page', '1'))
+        page_size = int(request.query_params.get('page_size', '10'))
 
         cache_key = hashlib.md5(
         (

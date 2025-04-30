@@ -22,8 +22,8 @@ class CommentsForBookAPIView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request, book_id):
-        page = request.query_params.get('page', '1')
-        page_size = request.query_params.get('page_size', '10')
+        page = int(request.query_params.get('page', '1'))
+        page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'Book_{book_id}_comments_page_{page}_size_{page_size}'
         cached_data = cache.get(cache_key)
         if cached_data:
@@ -53,19 +53,26 @@ class CommentDetailAPIView(APIView):
         cache.set(cache_key, serializer.data, timeout=CACHETIMEOUT)
         return Response(serializer.data, status=status.HTTP_200_OK)        
             
-class CommentManagementAPIView(APIView):
+
+class CreateCommentAPIView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, OwnerOrAdminPermission]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, book_id):
+        user = request.user
         serializer = CommentSerializer(data=request.data)
         book = get_object_or_404(Book, id=book_id)
         with transaction.atomic():
             if serializer.is_valid():
-                serializer.save(user=request.user, book=book)
-                return Response({'message': 'Comment added successfully'}, status=status.HTTP_200_OK)
+                serializer.save(user=user, book=book)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
        
+  
+class CommentManagementAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, OwnerOrAdminPermission]
+
     def delete(self, request, comment_id):
         user = request.user
         comment = get_object_or_404(Comment.objects.filter(user=user), id=comment_id)
@@ -89,8 +96,8 @@ class CommentListForUserAPIView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request, user_id):
-        page = request.query_params.get('page', '1')
-        page_size = request.query_params.get('page_size', '10')
+        page = int(request.query_params.get('page', '1'))
+        page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'User_{user_id}_comments_page_{page}_size_{page_size}'
         cached_data = cache.get(cache_key)
         if cached_data:
@@ -112,8 +119,8 @@ class LikeListForBookAPIView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request, book_id):
-        page = request.query_params.get('page', '1')
-        page_size = request.query_params.get('page', '10')
+        page = int(request.query_params.get('page', '1'))
+        page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'Likes_for_book_{book_id}_page_{page}_size_{page_size}'
         cached_data = cache.get(cache_key)
         if cached_data:
@@ -136,8 +143,8 @@ class LikeListForCommentAPIView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request, comment_id):
-        page = request.query_params.get('page', '1')
-        page_size = request.query_params.get('page', '10')
+        page = int(request.query_params.get('page', '1'))
+        page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'Likes_for_comment_{comment_id}_page_{page}_size_{page_size}'
         cached_data = cache.get(cache_key)
         if cached_data:
@@ -203,25 +210,4 @@ class LikeManagementForCommentAPIView(APIView):
             like.delete()
             return Response({'message': 'Like deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         return Response({'error': 'Like not found'}, status=status.HTTP_404_NOT_FOUND)
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

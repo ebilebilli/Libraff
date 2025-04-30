@@ -8,7 +8,6 @@ from django.core.cache import cache
 
 from libraff.settings import CACHETIMEOUT
 from utils.custom_pagination import CustomPagination
-from utils.permission_control import OwnerOrAdminPermission
 from users.models import CustomerUser
 from users.serializers import CustomerUserSerializer, RegisterSerializer, AccountUpdateSerializer, LoginSerializer
 
@@ -51,7 +50,7 @@ class LoginAPIView(APIView):
 
 
 class LogoutAPIView(APIView):
-    authentication_classes = []
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -69,8 +68,8 @@ class UserListAPIView(APIView):
     pagination_class = CustomPagination
 
     def get(self, request):
-        page = request.query_params.get('page', '1')
-        page_size = request.query_params.get('page_size', '10')
+        page = int(request.query_params.get('page', '1'))
+        page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'User_list_page_{page}_size_{page_size}'
         cached_data = cache.get(cache_key)
         if cached_data:

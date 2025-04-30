@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'books',
     'users',
     'interactions',
+    'favorites',
 
     #packages
     'drf_yasg',
