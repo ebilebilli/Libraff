@@ -17,6 +17,7 @@ djangorestframework-simplejwt = "*"
 django-redis = "*"
 psycopg2-binary = "*"
 docker = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

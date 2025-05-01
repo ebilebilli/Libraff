@@ -155,7 +155,7 @@ cd libraff
 2. **Set up virtual environment**
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  
 ```
 
 3. **Install dependencies**
@@ -166,7 +166,7 @@ pip install -r requirements.txt
 4. **Configure environment variables**
 ```bash
 cp .env.example .env
-# Edit .env with your configuration
+
 ```
 
 5. **Set up database**
@@ -213,13 +213,7 @@ redis-server
 - Asynchronous tasks
 - Connection pooling
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## 📝 License
 
@@ -227,8 +221,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-- **Your Name** - [@yourtwitter](https://twitter.com/yourtwitter)
-- **Email**: your.email@example.com
+- **Email**: ebilebilli3@gmail.com
 
 ## 🙏 Acknowledgments
 

@@ -79,6 +79,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'libraff.middleware.UserActionLoggingMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 # Custom User 
@@ -168,7 +171,7 @@ MEDIA_URL = os.getenv('MEDIA_URL', '/media/')
 
 #mail_settings
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'ebilebilli3@gmail.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
@@ -240,23 +243,55 @@ LOGGING = {
             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
             'style': '{',
         },
+        'simple': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
     },
     'handlers': {
         'file': {
             'level': os.getenv('LOG_LEVEL', 'INFO'),
             'class': 'logging.FileHandler',
-            'filename': os.getenv('LOG_FILE', os.path.join(BASE_DIR, 'logs/django.log')),
+            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
             'formatter': 'verbose',
         },
-        'console': {
+        'interactions_file': {
             'level': os.getenv('LOG_LEVEL', 'INFO'),
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'interactions.log'),
+            'formatter': 'simple',
+        },
+        'favorites_file': {
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'favorites.log'),
+            'formatter': 'simple',
+        },
+        'middleware_file': {
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'middleware.log'),
+            'formatter': 'simple',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['file'],
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'propagate': True,
+        },
+        'interactions': {
+            'handlers': ['interactions_file'],
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'propagate': True,
+        },
+        'favorites': {
+            'handlers': ['favorites_file'],
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
+            'propagate': True,
+        },
+        'middleware': {
+            'handlers': ['middleware_file'],
             'level': os.getenv('LOG_LEVEL', 'INFO'),
             'propagate': True,
         },
