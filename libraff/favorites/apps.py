@@ -1,6 +1,9 @@
 from django.apps import AppConfig
 
 
-class FavoritesConfig(AppConfig):
+class FavoritesConfig(AppConfig):  
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'favorites'
+    name = 'interactions'
+
+    def ready(self):
+        import favorites.signals

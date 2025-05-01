@@ -14,7 +14,6 @@ from books.models import Book
 from users.models import CustomerUser
 from favorites.models import Favorite
 from favorites.serializers import FavoriteSerializer
-from books.serializers import BookSerializer
 
 
 class OpenFavoriteListForUserAPIView(APIView):
@@ -91,6 +90,9 @@ class CreateFavoriteAPIView(APIView):
         user = request.user
         serializer = FavoriteSerializer(data=request.data)
         book = get_object_or_404(Book, id=book_id)
+        if Favorite.objects.filter(user=user, book=book).exists():
+                return Response({'message': 'Already favorited'}, status=status.HTTP_400_BAD_REQUEST)
+        
         with transaction.atomic():
             if serializer.is_valid():
                 serializer.save(user=user, book=book)

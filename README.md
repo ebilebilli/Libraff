@@ -1,174 +1,241 @@
-📚 **Book Library API**
-A Django REST Framework based API for managing books, user profiles, comments, and likes. Users can search, download books, and interact through likes and comments.
+# 📚 Libraff - Modern Book Management System
 
-🚀 **Features**
+<div align="center">
+  <img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
+  <img src="https://img.shields.io/badge/DRF-FF1709?style=for-the-badge&logo=django&logoColor=white" alt="Django REST Framework">
+  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white" alt="JWT">
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis">
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
+</div>
 
-### Book Management:
-- List, retrieve, create, update, and delete books.
-- Like/unlike books.
-- Download books as PDFs.
-- Search books by title.
+## 🚀 Overview
 
-### User Management:
-- Register new users.
-- Update user profiles.
-- List all users.
+Libraff is a modern, scalable book management system built with Django and Django REST Framework. It provides a comprehensive platform for managing and accessing books with advanced features like social interactions, user management, and performance optimizations.
 
-### Comment System:
-- Add comments to books.
-- View comments by users and books.
-- Like/unlike comments.
+## ✨ Key Features
 
-🛠️ Technologies Used
-Django 5.1.6 (Python Web Framework)
+### 📖 Book Management
+- **Comprehensive Book Operations**
+  - View detailed book information
+  - Download books in PDF format
+  - Advanced search and filtering
+  - Book categorization system
+  - Price range filtering
+  - Author and context-based search
 
-Django REST Framework (API Development)
+### 👥 User Experience
+- **Authentication & Authorization**
+  - JWT-based authentication
+  - Secure user registration
+  - Role-based access control
+  - Profile management
+  - Session management
 
-SQLite/PostgreSQL (Database Options)
+### 💬 Social Features
+- **Interactive Platform**
+  - Comment system for books
+  - Like/unlike functionality
+  - Public and private favorites
+  - User activity tracking
+  - Social interactions
 
-Redis (Caching and Celery Backend)
+### ⚡ Performance
+- **Optimized System**
+  - Redis caching implementation
+  - Custom pagination
+  - Database query optimization
+  - Asynchronous task processing
+  - WebSocket support for real-time updates
 
-Celery (Asynchronous Task Processing)
+## 🔧 Technical Stack
 
-Django Channels (WebSocket Support)
+- **Backend Framework**: Django 5.1.6
+- **API Framework**: Django REST Framework
+- **Authentication**: JWT (JSON Web Tokens)
+- **Database**: PostgreSQL/SQLite
+- **Caching**: Redis
+- **Task Queue**: Celery
+- **Real-time**: Django Channels
+- **API Documentation**: DRF-YASG (Swagger/OpenAPI)
 
-DRF-YASG (API Documentation with Swagger/OpenAPI)
+## 📡 API Documentation
 
+### Authentication Endpoints
 
-New Updates (March 2025)
-API Versioning: Added support for v1/ and v2/ endpoints.
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/api/auth/register/` | POST | Register new user | No |
+| `/api/auth/login/` | POST | User login | No |
+| `/api/auth/logout/` | POST | User logout | Yes |
 
-Rate Limiting: Prevent abuse with throttling for unauthenticated and authenticated users.
+### User Management
 
-OAuth2 Authentication: Optional Google/GitHub login alongside token-based auth.
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/api/users/` | GET | List all users | No |
+| `/api/users/{user_id}/` | GET | Get user details | No |
+| `/api/users/{user_id}/` | PATCH | Update user profile | Yes |
 
-Caching: Improved performance with Redis caching for frequently accessed endpoints.
+### Book Management
 
-WebSocket Support: Real-time notifications for likes and comments (via Django Channels).
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/api/books/` | GET | List all books | No |
+| `/api/books/{book_id}/` | GET | Get book details | No |
+| `/api/books/{book_id}/` | PATCH | Update book status | Yes |
+| `/api/books/category/{category_id}/` | GET | List books by category | No |
+| `/api/books/search/` | GET | Search books | No |
+| `/api/books/filter/` | GET | Filter books | No |
+| `/api/books/{book_id}/download/` | GET | Download book | Yes |
 
-AI-Powered Search: Integrated basic AI-driven recommendations for books.
+### Comments System
 
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/api/books/{book_id}/comments/` | GET | List book comments | No |
+| `/api/comments/{comment_id}/` | GET | Get comment details | No |
+| `/api/books/{book_id}/comments/` | POST | Create comment | Yes |
+| `/api/comments/{comment_id}/` | PATCH | Update comment | Yes |
+| `/api/comments/{comment_id}/` | DELETE | Delete comment | Yes |
 
+### Likes System
 
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/api/books/{book_id}/likes/` | GET | List book likes | No |
+| `/api/books/{book_id}/likes/` | POST | Like book | Yes |
+| `/api/books/{book_id}/likes/` | DELETE | Unlike book | Yes |
+| `/api/comments/{comment_id}/likes/` | GET | List comment likes | No |
+| `/api/comments/{comment_id}/likes/` | POST | Like comment | Yes |
+| `/api/comments/{comment_id}/likes/` | DELETE | Unlike comment | Yes |
 
+### Favorites System
 
-📄 **Installation & Setup**
+| Endpoint | Method | Description | Auth Required |
+|----------|--------|-------------|---------------|
+| `/api/users/{user_id}/favorites/open/` | GET | List public favorites | No |
+| `/api/users/{user_id}/favorites/private/` | GET | List private favorites | Yes |
+| `/api/favorites/{favorite_id}/` | GET | Get favorite details | Yes |
+| `/api/books/{book_id}/favorites/` | POST | Add to favorites | Yes |
+| `/api/favorites/{favorite_id}/` | PATCH | Update favorite | Yes |
+| `/api/favorites/{favorite_id}/` | DELETE | Remove favorite | Yes |
 
-1. Clone the repository:
+## 🛠️ Query Parameters
 
+### Pagination
+- `page`: Page number (default: 1)
+- `page_size`: Items per page (default: 10)
+
+### Search
+- `query`: Search term for book titles
+
+### Filtering
+- `price_from`: Minimum price
+- `price_to`: Maximum price
+- `category`: Filter by category
+- `author`: Filter by author
+- `context`: Filter by context
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Python 3.8+
+- PostgreSQL (optional)
+- Redis
+- Virtual environment
+
+### Installation
+
+1. **Clone the repository**
 ```bash
-git clone <repository_url>
-cd book-library-api
+git clone https://github.com/yourusername/libraff.git
+cd libraff
 ```
 
-2. Set up a virtual environment:
-
+2. **Set up virtual environment**
 ```bash
-python -m venv env
-source env/bin/activate  # Mac/Linux
-env\Scripts\activate    # Windows
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. Install dependencies:
-
+3. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Apply database migrations:
+4. **Configure environment variables**
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
+5. **Set up database**
 ```bash
 python manage.py migrate
 ```
 
-5. Create a superuser (optional for admin access):
-
+6. **Create superuser**
 ```bash
 python manage.py createsuperuser
 ```
 
-6. Start the development server:
-
+7. **Run development server**
 ```bash
 python manage.py runserver
 ```
 
-7.Run Celery for Background Tasks (optional):
-bash
-
+8. **Run Celery worker**
+```bash
 celery -A libraff worker -l info
+```
 
-8.Run Redis (for caching and Celery):
-Ensure Redis is installed and running locally (redis-server).
+9. **Run Redis server**
+```bash
+redis-server
+```
 
+## 🔐 Security Features
 
+- JWT-based authentication
+- Password hashing
+- CSRF protection
+- Rate limiting
+- Input validation
+- Secure file uploads
+- Role-based access control
+
+## 📊 Performance Optimizations
+
+- Redis caching
+- Database query optimization
+- Pagination
+- Lazy loading
+- Asynchronous tasks
+- Connection pooling
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+- **Your Name** - [@yourtwitter](https://twitter.com/yourtwitter)
+- **Email**: your.email@example.com
+
+## 🙏 Acknowledgments
+
+- Django REST Framework team
+- Redis community
+- PostgreSQL team
+- All contributors
 
 ---
-
-### 📊 **API Endpoints**
-
-| Category                 | Method | Endpoint                          | Description                            | Authentication Required |
-|--------------------------|--------|-----------------------------------|----------------------------------------|-------------------------|
-| **Authentication**       | POST   | /login/                           | Obtain auth token                      | No                      |
-|                          | POST   | /register/                        | Register a new user                    | No                      |
-| **Book Management**      | GET    | /books/                           | List all books (paginated)             | No                      |
-|                          | POST   | /books/                           | Add a new book                         | Yes                     |
-|                          | GET    | /book/<book_id>/                  | Retrieve book details                  | Yes                     |
-|                          | PUT    | /book/<book_id>/                  | Update book completely                 | Yes                     |
-|                          | PATCH  | /book/<book_id>/                  | Partially update book                  | Yes                     |
-|                          | DELETE | /book/<book_id>/                  | Delete a book                          | Yes                     |
-|                          | POST   | /book/<book_id>/like/             | Like/unlike a book                     | Yes                     |
-|                          | GET    | /book/<book_id>/download/         | Download book PDF                      | Yes                     |
-|                          | GET    | /books/search/?query=<str>        | Search books by title                  | No                      |
-| **User Management**      | GET    | /users/                           | List all users (paginated)             | Yes                     |
-|                          | GET    | /user/<user_id>/                  | Get user details                       | Yes                     |
-|                          | PATCH  | /user/<user_id>/                  | Update user profile                    | Yes                     |
-|                          | GET    | /user/<user_id>/comments/         | List user's comments                   | Yes                     |
-|                          | GET    | /user/<user_id>/liked_books/      | List user's liked books                | Yes                     |
-| **Comment Management**   | GET    | /book/<book_id>/comments/         | List book comments (paginated)         | Yes                     |
-|                          | POST   | /book/<book_id>/comments/         | Add comment to a book                  | Yes                     |
-|                          | GET    | /comment/likes/                   | List all liked comments                | Yes                     |
-
----
-
-### 📘 **Models**
-
-#### **Book Model**
-
-```python
-class Book(models.Model):
-    author = models.CharField(max_length=255, null=True, blank=True)
-    title = models.CharField(max_length=255, null=True, blank=True)
-    price = models.PositiveSmallIntegerField(null=True, blank=True)
-    like = models.IntegerField(default=0)
-    pdf = models.FileField(upload_to='books/pdf')
-
-    def __str__(self):
-        return self.title
-```
-
-#### **User Model**
-
-```python
-class CustomerUser(AbstractUser):
-    email = models.EmailField(unique=True, null=True, blank=True)
-    bio = models.TextField(max_length=550, null=True, blank=True)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-```
-
-#### **Comment Model**
-
-```python
-class Comments(models.Model):
-    user = models.ForeignKey(CustomerUser, on_delete=models.CASCADE, related_name='comments')
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='comments')
-    content = models.TextField(max_length=1000)
-    created_at = models.DateTimeField(auto_now_add=True)
-```
-
-📜 **License**
-This project is licensed under the MIT License.
-
-👨‍💻 **Author**
-Developed by Abil Abilli 🚀
 
