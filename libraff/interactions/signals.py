@@ -14,6 +14,7 @@ def clean_comment_cache(instance, sender, **kwargs):
     cache.delete(f'Comment_detail_{comment_id}')
     cache.delete_pattern(f'User_{instance.user.id}_comments_page_*')
 
+
 @receiver([post_save, post_delete], sender=Like)
 def clean_like_cache(instance, sender, **kwargs):
     if instance.book:
@@ -33,6 +34,8 @@ def log_comment_saved(instance, sender, created, **kwargs):
     if created:
         logger.info(f'User_{user_id}_wrote_comment_{comment_id}_book_{book_id}')
 
+    else:
+        logger.info(f'User_{user_id}_update_comment_{comment_id}_book_{book_id}')
 
 @receiver(post_delete, sender=Comment)
 def log_comment_deleted(instance, **kwargs):
@@ -43,6 +46,7 @@ def log_comment_deleted(instance, **kwargs):
         logger.info(f'User_{user_id}_delete_comment_{comment_id}_book_{book_id}')
     except Exception as e:
         logger.warning(f'Failed to log deleted comment ID {instance.id}: {e}')
+
 
 @receiver(post_save, sender=Like)
 def log_like_saved(instance, sender, created, **kwargs):

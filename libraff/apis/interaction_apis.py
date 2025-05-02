@@ -16,12 +16,13 @@ from interactions.models import Comment, Like
 from interactions.serializers import CommentSerializer, LikeSerializer
 
 
-#Comment views
 class CommentsForBookAPIView(APIView):
+    """API view for listing comments for a book."""
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
 
     def get(self, request, book_id):
+        """Get paginated list of comments for a specific book."""
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'Book_{book_id}_comments_page_{page}_size_{page_size}'
@@ -33,15 +34,19 @@ class CommentsForBookAPIView(APIView):
         pagination = self.pagination_class()
         result_page = pagination.paginate_queryset(comments, request)
         serializer = CommentSerializer(result_page, many=True)
-        paginated_response = pagination.get_paginated_response(serializer.data).data
+        paginated_response = pagination.get_paginated_response(
+            serializer.data,
+        ).data
         cache.set(cache_key, paginated_response, timeout=CACHETIMEOUT)
         return Response(paginated_response, status=status.HTTP_200_OK)
 
 
 class CommentDetailAPIView(APIView):
+    """API view for comment details."""
     permission_classes = [AllowAny]
 
     def get(self, request, comment_id):
+        """Get details of a specific comment."""
         user = request.user
         cache_key = f'Comment_detail_{comment_id}'
         cached_data = cache.get(cache_key)
@@ -51,51 +56,83 @@ class CommentDetailAPIView(APIView):
         comment = get_object_or_404(Comment, id=comment_id)
         serializer = CommentSerializer(comment)
         cache.set(cache_key, serializer.data, timeout=CACHETIMEOUT)
-        return Response(serializer.data, status=status.HTTP_200_OK)        
-            
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class CreateCommentAPIView(APIView):
+    """API view for creating comments."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, book_id):
+        """Create a new comment for a book."""
         user = request.user
         serializer = CommentSerializer(data=request.data)
         book = get_object_or_404(Book, id=book_id)
         with transaction.atomic():
             if serializer.is_valid():
                 serializer.save(user=user, book=book)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-       
-  
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED,
+                )
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
 class CommentManagementAPIView(APIView):
+    """API view for managing comments."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, OwnerOrAdminPermission]
 
     def delete(self, request, comment_id):
+        """Delete a comment."""
         user = request.user
-        comment = get_object_or_404(Comment.objects.filter(user=user), id=comment_id)
+        comment = get_object_or_404(
+            Comment.objects.filter(user=user),
+            id=comment_id,
+        )
         comment.delete()
-        return Response({'message': 'Comment deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {'message': 'Comment deleted successfully'},
+            status=status.HTTP_204_NO_CONTENT,
+        )
         
     def patch(self, request, comment_id):
+        """Update a comment."""
         user = request.user
-        comment = get_object_or_404(Comment.objects.filter(user=user), id=comment_id)
-        serializer = CommentSerializer(comment, data=request.data, partial=True)
+        comment = get_object_or_404(
+            Comment.objects.filter(user=user),
+            id=comment_id,
+        )
+        serializer = CommentSerializer(
+            comment,
+            data=request.data,
+            partial=True,
+        )
         with transaction.atomic():
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_200_OK,
+                )
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class CommentListForUserAPIView(APIView):
+    """API view for listing user's comments."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, OwnerOrAdminPermission]
     pagination_class = CustomPagination
 
     def get(self, request, user_id):
+        """Get paginated list of comments by a specific user."""
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'User_{user_id}_comments_page_{page}_size_{page_size}'
@@ -108,17 +145,20 @@ class CommentListForUserAPIView(APIView):
         comment = Comment.objects.filter(user=user)
         result_page = pagination.paginate_queryset(comment, request)
         serializer = CommentSerializer(result_page, many=True)
-        paginated_response = pagination.get_paginated_response(serializer.data).data
+        paginated_response = pagination.get_paginated_response(
+            serializer.data,
+        ).data
         cache.set(cache_key, paginated_response, timeout=CACHETIMEOUT)
         return Response(paginated_response, status=status.HTTP_200_OK)
-      
 
-#Like views
+
 class LikeListForBookAPIView(APIView):
+    """API view for listing likes for a book."""
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
 
     def get(self, request, book_id):
+        """Get paginated list of likes for a specific book."""
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'Likes_for_book_{book_id}_page_{page}_size_{page_size}'
@@ -132,17 +172,21 @@ class LikeListForBookAPIView(APIView):
         like_count = likes.count()
         result_page = pagination.paginate_queryset(likes, request)
         serializer = LikeSerializer(result_page, many=True)
-        paginated_response = pagination.get_paginated_response(serializer.data).data
+        paginated_response = pagination.get_paginated_response(
+            serializer.data,
+        ).data
         paginated_response['like_count'] = like_count
         cache.set(cache_key, paginated_response, timeout=CACHETIMEOUT)
         return Response(paginated_response, status=status.HTTP_200_OK)
-    
+
 
 class LikeListForCommentAPIView(APIView):
+    """API view for listing likes for a comment."""
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
 
     def get(self, request, comment_id):
+        """Get paginated list of likes for a specific comment."""
         page = int(request.query_params.get('page', '1'))
         page_size = int(request.query_params.get('page_size', '10'))
         cache_key = f'Likes_for_comment_{comment_id}_page_{page}_size_{page_size}'
@@ -156,58 +200,90 @@ class LikeListForCommentAPIView(APIView):
         like_count = likes.count()
         result_page = pagination.paginate_queryset(likes, request)
         serializer = LikeSerializer(result_page, many=True)
-        paginated_response = pagination.get_paginated_response(serializer.data).data
+        paginated_response = pagination.get_paginated_response(
+            serializer.data,
+        ).data
         paginated_response['like_count'] = like_count
         cache.set(cache_key, paginated_response, timeout=CACHETIMEOUT)
         return Response(paginated_response, status=status.HTTP_200_OK)
 
 
 class LikeManagementForBookAPIView(APIView):
+    """API view for managing likes on books."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, book_id):
+        """Create a like for a book."""
         user = request.user
         book = get_object_or_404(Book, id=book_id)
         if Like.objects.filter(user=user, book=book).exists():
-            return Response({'error': 'Already you liked this book'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Already you liked this book'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         
         with transaction.atomic():
             like = Like.objects.create(user=user, book=book)
             serializer = LikeSerializer(like)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK,
+            )
     
     def delete(self, request, book_id):
+        """Delete a like from a book."""
         user = request.user
         book = get_object_or_404(Book, id=book_id)
         like = Like.objects.filter(user=user, book=book).first()
         if like:
             like.delete()
-            return Response({'message': 'Like deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-        return Response({'error': 'Like not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'message': 'Like deleted successfully'},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        return Response(
+            {'error': 'Like not found'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
 
 class LikeManagementForCommentAPIView(APIView):
+    """API view for managing likes on comments."""
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, comment_id):
+        """Create a like for a comment."""
         user = request.user
         comment = get_object_or_404(Comment, id=comment_id)
         if Like.objects.filter(user=user, comment=comment).exists():
-            return Response({'error': 'Already you liked this comment'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Already you liked this comment'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         
         with transaction.atomic():
             like = Like.objects.create(user=user, comment=comment)
             serializer = LikeSerializer(like)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK,
+            )
     
     def delete(self, request, comment_id):
+        """Delete a like from a comment."""
         user = request.user
         comment = get_object_or_404(Comment, id=comment_id)
         like = Like.objects.filter(user=user, comment=comment).first()
         if like:
             like.delete()
-            return Response({'message': 'Like deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-        return Response({'error': 'Like not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'message': 'Like deleted successfully'},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        return Response(
+            {'error': 'Like not found'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
