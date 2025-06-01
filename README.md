@@ -45,7 +45,7 @@ Libraff is a modern, scalable book management system built with Django and Djang
   - Custom pagination
   - Database query optimization
   - Asynchronous task processing
-  - WebSocket support for real-time updates
+  
 
 ## 🔧 Technical Stack
 
@@ -55,7 +55,6 @@ Libraff is a modern, scalable book management system built with Django and Djang
 - **Database**: PostgreSQL/SQLite
 - **Caching**: Redis
 - **Task Queue**: Celery
-- **Real-time**: Django Channels
 - **API Documentation**: DRF-YASG (Swagger/OpenAPI)
 
 ## 📡 API Documentation
@@ -140,7 +139,7 @@ Libraff is a modern, scalable book management system built with Django and Djang
 
 ### Prerequisites
 - Python 3.8+
-- PostgreSQL (optional)
+- PostgreSQL 
 - Redis
 - Virtual environment
 
